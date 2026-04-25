@@ -218,38 +218,6 @@ export default function Calculateur() {
             </button>
           </div>
         </div>
-
-        {/* ===== FORMULES ===== */}
-        <div>
-          <div className="card">
-            <div className="card-title">📐 Rappel des formules</div>
-            <FormulaCard
-              titre="N optimal"
-              formule="N = √(C × Pu × t / (200 × f))"
-              explication="Nombre optimal de commandes annuelles"
-            />
-            <FormulaCard
-              titre="Quantité économique"
-              formule="Qe = C / N"
-              explication="Quantité à commander à chaque commande"
-            />
-            <FormulaCard
-              titre="Période de commande"
-              formule="T = 12 / N (mois)"
-              explication="Délai entre chaque commande"
-            />
-            <FormulaCard
-              titre="Point de commande"
-              formule="SCM = (C/12) × d + Ss"
-              explication="Niveau de stock déclenchant une commande"
-            />
-            <FormulaCard
-              titre="Coût de stockage"
-              formule="Cs = f×N + (C×Pu×t) / (200×N)"
-              explication="Coût total minimal de stockage"
-            />
-          </div>
-        </div>
       </div>
 
       {/* ===== RÉSULTATS ===== */}
