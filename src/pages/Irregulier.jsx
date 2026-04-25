@@ -126,8 +126,6 @@ export default function Irregulier() {
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         {[
           { key: 'quantites', label: '📦 Quantités constantes', desc: 'Lot fixe Qe, dates variables' },
-          { key: 'periodes', label: '📅 Périodes constantes', desc: 'Dates fixes, quantités variables' },
-          { key: 'comparaison', label: '⚖️ Comparaison', desc: 'Les deux méthodes côte à côte' },
         ].map((o) => (
           <button
             key={o.key}
@@ -146,19 +144,6 @@ export default function Irregulier() {
             <strong>📦 Méthode des quantités constantes :</strong> On commande toujours la même
             quantité Qe (calculée par Wilson), mais les dates de commande varient selon le niveau
             du stock. On déclenche une commande quand le stock atteint le point de commande (SCM).
-          </>
-        )}
-        {onglet === 'periodes' && (
-          <>
-            <strong>📅 Méthode des périodes constantes :</strong> On commande à intervalles de
-            temps réguliers (T = 12/N mois), mais les quantités commandées varient pour couvrir
-            la consommation jusqu'à la prochaine livraison.
-          </>
-        )}
-        {onglet === 'comparaison' && (
-          <>
-            <strong>⚖️ Comparaison des deux méthodes :</strong> Visualisez et comparez les deux
-            approches pour choisir la plus adaptée à votre situation.
           </>
         )}
       </div>
@@ -320,47 +305,6 @@ export default function Irregulier() {
   
     return (
       <>
-        {/* Wilson de base */}
-        <div className="card">
-          <div className="card-title">
-            📐 Base Wilson — consommation annuelle totale : {fmt(consommation_annuelle)} u
-          </div>
-          <div className="grid-4">
-            <div className="stat-card blue">
-              <div className="stat-label">N optimal</div>
-              <div className="stat-value">{wilson_base.N_arrondi}</div>
-              <div className="stat-unit">commandes/an</div>
-            </div>
-            <div className="stat-card green">
-              {onglet === 'quantites' ? (
-                <>
-                  <div className="stat-label">Qe (lot fixe)</div>
-                  <div className="stat-value">{fmt(wilson_base.Qe)}</div>
-                  <div className="stat-unit">u/commande</div>
-                </>
-              ) : (
-                <>
-                  <div className="stat-label">Période fixe T</div>
-                  <div className="stat-value">{wilson_base.periode_mois}</div>
-                  <div className="stat-unit">mois entre commandes</div>
-                </>
-              )}
-            </div>
-            <div className="stat-card orange">
-              <div className="stat-label">Point de commande SCM</div>
-              <div className="stat-value">{fmt(wilson_base.point_commande)}</div>
-              <div className="stat-unit">unités</div>
-            </div>
-            <div className="stat-card purple">
-              <div className="stat-label">Coût stockage min</div>
-              <div className="stat-value" style={{ fontSize: '1rem' }}>
-                {fmt(wilson_base.cout_stockage_min)}
-              </div>
-              <div className="stat-unit">Ar</div>
-            </div>
-          </div>
-        </div>
-  
         {/* Statistiques simulation */}
         <div className="card">
           <div className="card-title">
@@ -418,7 +362,7 @@ export default function Irregulier() {
         {/* TABLEAU EXACT DU COURS */}
         <div className="card">
           <div className="card-title">
-            📋 Tableaux de suivi du stock — Format cours GFB
+            📋 Tableaux de suivi du stock
           </div>
           <ResumeStockTable
             tableau={simulation.tableau}
@@ -429,147 +373,3 @@ export default function Irregulier() {
       </>
     );
   }
-
-/* ============================================================
-   Composant comparaison des deux méthodes
-   ============================================================ */
-function ResultatComparaison({ resultat, fmt }) {
-  const { wilson_base, methode_quantites_constantes: mqc, methode_periodes_constantes: mpc,
-    consommation_annuelle } = resultat;
-
-  const statsQC = mqc.statistiques;
-  const statsPC = mpc.statistiques;
-
-  return (
-    <>
-      {/* Données Wilson */}
-      <div className="card">
-        <div className="card-title">📐 Base Wilson commune</div>
-        <div className="grid-4">
-          <div className="stat-card blue">
-            <div className="stat-label">N optimal</div>
-            <div className="stat-value">{wilson_base.N_arrondi}</div>
-            <div className="stat-unit">commandes/an</div>
-          </div>
-          <div className="stat-card green">
-            <div className="stat-label">Qe (lot fixe)</div>
-            <div className="stat-value">{fmt(wilson_base.Qe)}</div>
-            <div className="stat-unit">u/commande</div>
-          </div>
-          <div className="stat-card orange">
-            <div className="stat-label">Période fixe</div>
-            <div className="stat-value">{wilson_base.periode_mois}</div>
-            <div className="stat-unit">mois</div>
-          </div>
-          <div className="stat-card purple">
-            <div className="stat-label">SCM</div>
-            <div className="stat-value">{fmt(wilson_base.point_commande)}</div>
-            <div className="stat-unit">unités</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tableau comparatif */}
-      <div className="card">
-        <div className="card-title">⚖️ Tableau comparatif</div>
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Critère</th>
-                <th>📦 Quantités constantes</th>
-                <th>📅 Périodes constantes</th>
-                <th>Meilleure méthode</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                {
-                  critere: 'Nb commandes',
-                  qc: statsQC.nb_livraisons,
-                  pc: statsPC.nb_livraisons,
-                  unite: '',
-                  mieux: (a, b) => a <= b,
-                },
-                {
-                  critere: 'Stock moyen',
-                  qc: Math.round(statsQC.stock_moyen),
-                  pc: Math.round(statsPC.stock_moyen),
-                  unite: ' u',
-                  mieux: (a, b) => a <= b,
-                },
-                {
-                  critere: 'Stock minimum',
-                  qc: Math.round(statsQC.stock_min),
-                  pc: Math.round(statsPC.stock_min),
-                  unite: ' u',
-                  mieux: (a, b) => a >= b,
-                },
-                {
-                  critere: 'Ruptures de stock',
-                  qc: statsQC.nb_ruptures,
-                  pc: statsPC.nb_ruptures,
-                  unite: '',
-                  mieux: (a, b) => a <= b,
-                },
-              ].map((row, i) => {
-                const qcMieux = row.mieux(row.qc, row.pc);
-                const egal = row.qc === row.pc;
-                return (
-                  <tr key={i}>
-                    <td><strong>{row.critere}</strong></td>
-                    <td style={{ background: qcMieux && !egal ? '#f0fff4' : 'transparent' }}>
-                      {fmt(row.qc)}{row.unite}
-                      {qcMieux && !egal && <span className="badge badge-success" style={{ marginLeft: '0.5rem' }}>✓</span>}
-                    </td>
-                    <td style={{ background: !qcMieux && !egal ? '#f0fff4' : 'transparent' }}>
-                      {fmt(row.pc)}{row.unite}
-                      {!qcMieux && !egal && <span className="badge badge-success" style={{ marginLeft: '0.5rem' }}>✓</span>}
-                    </td>
-                    <td>
-                      {egal
-                        ? <span className="badge badge-info">Égalité</span>
-                        : qcMieux
-                          ? <span className="badge badge-success">📦 Qtés constantes</span>
-                          : <span className="badge badge-warning">📅 Périodes constantes</span>}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Graphiques côte à côte */}
-      <div className="grid-2">
-        <div className="card">
-          <div className="card-title">📦 Évolution — Quantités constantes</div>
-          <StockChart
-            resume={mqc.simulation.resume}
-            point_commande={wilson_base.point_commande}
-          />
-        </div>
-        <div className="card">
-          <div className="card-title">📅 Évolution — Périodes constantes</div>
-          <StockChart
-            resume={mpc.simulation.resume}
-            point_commande={wilson_base.point_commande}
-          />
-        </div>
-      </div>
-
-      {/* Tableaux côte à côte */}
-      <div className="grid-2">
-        <div className="card">
-          <div className="card-title">📋 Tableau — Quantités constantes</div>
-          <ResumeStockTable resume={mqc.simulation.resume} />
-        </div>
-        <div className="card">
-          <div className="card-title">📋 Tableau — Périodes constantes</div>
-          <ResumeStockTable resume={mpc.simulation.resume} />
-        </div>
-      </div>
-    </>
-  );
-}

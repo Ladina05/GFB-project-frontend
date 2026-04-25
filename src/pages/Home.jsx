@@ -33,16 +33,6 @@ export default function Home() {
             lien: '/irregulier',
           },
           {
-            icon: '⚖️', titre: 'Comparaison des méthodes',
-            desc: 'Comparez quantités constantes vs périodes constantes pour choisir la meilleure',
-            lien: '/irregulier',
-          },
-          {
-            icon: '📈', titre: 'Graphiques interactifs',
-            desc: 'Évolution du stock, courbes de coûts, détection des ruptures',
-            lien: '/calculateur',
-          },
-          {
             icon: '💾', titre: 'Historique',
             desc: 'Sauvegarde en PostgreSQL de tous vos calculs et simulations',
             lien: '/historique',

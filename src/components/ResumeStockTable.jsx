@@ -1,27 +1,3 @@
-/**
- * Reproduit EXACTEMENT les tableaux du cours GFB pages 58-60
- *
- * TABLEAU DÉTAILLÉ (format cours §5.1 et §5.2) :
- * ┌──────────┬──────────────┬────────────────────────────┬───────────┬──────────────────────────────────┬──────────────────┐
- * │ Périodes │ Consomm.     │ Stock avec rupture évent.  │ Livraisons│ Stock rectifié en fonct. entrées │ Commandes        │
- * │          │              │                            │           │                                  │ Date │ Quantité  │
- * ├──────────┼──────────────┼────────────────────────────┼───────────┼──────────────────────────────────┼──────┼───────────┤
- * │ D        │              │            350             │           │              350                 │      │           │
- * │ J        │     200      │            150             │           │              150                 │début D│   400    │
- * │ F        │     150      │              0 (1)         │    400    │              400                 │      │           │
- * ...
- *
- * TABLEAU SYNTHÈSE (format cours page 59) :
- * ┌───────────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬────┬─────┬─────┬─────┬─────┬─────┐
- * │           │  D  │  J  │  F  │  M  │  A  │  M  │  J  │ Ju │  A  │  S  │  O  │  N  │  D  │
- * ├───────────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼────┼─────┼─────┼─────┼─────┼─────┤
- * │ Commandes │ 400 │ 400 │     │ 400 │     │     │ 400 │    │ 400 │ 400 │     │     │     │
- * │ Livraisons│     │     │ 400 │ 400 │     │ 400 │     │    │ 400 │     │ 400 │ 400 │     │
- * │ Sorties   │     │ 200 │ 150 │ 250 │ 250 │ 200 │ 200 │150 │  50 │ 200 │ 250 │ 250 │ 250 │
- * │ Stock     │ 350 │ 150 │ 400 │ 550 │ 300 │ 500 │ 300 │150 │ 500 │ 300 │ 450 │ 600 │ 350 │
- * └───────────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴────┴─────┴─────┴─────┴─────┴─────┘
- */
-
 export default function ResumeStockTable({ tableau, synthese, methode }) {
   if (!tableau || tableau.length === 0) return null;
 
@@ -32,7 +8,7 @@ export default function ResumeStockTable({ tableau, synthese, methode }) {
 
   const titre =
     methode === 'quantites_constantes'
-      ? '§ 5.1 — Commandes de quantités constantes'
+      ? 'Commandes de quantités constantes'
       : '§ 5.2 — Commandes par périodes constantes';
 
   /* ── styles inline pour coller au cours ── */
@@ -201,11 +177,9 @@ export default function ResumeStockTable({ tableau, synthese, methode }) {
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════
-          TABLEAU SYNTHÈSE — Format exact cours page 59-60
-          Lignes : Commandes / Livraisons / Sorties / Stock
-          Colonnes : D | J | F | M | A | M | J | Ju | A | S | O | N | D
-          ══════════════════════════════════════════════════════════════ */}
+      {/* ═════════════════
+          TABLEAU SYNTHÈSE
+          ═════════════════ */}
       {synthese && <TableauSynthese synthese={synthese} fmt={fmt} />}
     </div>
   );
@@ -255,7 +229,7 @@ function TableauSynthese({ synthese, fmt }) {
         background: '#1a365d', color: 'white', padding: '8px 14px',
         borderRadius: '8px 8px 0 0', fontWeight: 700, fontSize: '0.9rem',
       }}>
-        Tableau de synthèse — Commandes / Livraisons / Sorties / Stock
+        Tableau de synthèse
       </div>
 
       <div style={{ overflowX: 'auto' }}>
