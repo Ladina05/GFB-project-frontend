@@ -315,120 +315,120 @@ export default function Irregulier() {
 /* ============================================================
    Composant résultat — une seule méthode
    ============================================================ */
-function ResultatSimple({ resultat, onglet, fmt }) {
-  const { wilson_base, simulation, statistiques, consommation_annuelle } = resultat;
-  const sim = simulation;
-
-  return (
-    <>
-      {/* Wilson de base */}
-      <div className="card">
-        <div className="card-title">
-          📐 Base Wilson (consommation annuelle = {fmt(consommation_annuelle)} u)
-        </div>
-        <div className="grid-4">
-          <div className="stat-card blue">
-            <div className="stat-label">N optimal</div>
-            <div className="stat-value">{wilson_base.N_arrondi}</div>
-            <div className="stat-unit">commandes/an</div>
+   function ResultatSimple({ resultat, onglet, fmt }) {
+    const { wilson_base, simulation, statistiques, consommation_annuelle } = resultat;
+  
+    return (
+      <>
+        {/* Wilson de base */}
+        <div className="card">
+          <div className="card-title">
+            📐 Base Wilson — consommation annuelle totale : {fmt(consommation_annuelle)} u
           </div>
-          <div className="stat-card green">
-            {onglet === 'quantites' ? (
-              <>
-                <div className="stat-label">Qe (lot fixe)</div>
-                <div className="stat-value">{fmt(wilson_base.Qe)}</div>
-                <div className="stat-unit">unités/commande</div>
-              </>
-            ) : (
-              <>
-                <div className="stat-label">Période fixe</div>
-                <div className="stat-value">{wilson_base.periode_mois}</div>
-                <div className="stat-unit">mois entre commandes</div>
-              </>
-            )}
-          </div>
-          <div className="stat-card orange">
-            <div className="stat-label">Point de commande</div>
-            <div className="stat-value">{fmt(wilson_base.point_commande)}</div>
-            <div className="stat-unit">unités (SCM)</div>
-          </div>
-          <div className="stat-card purple">
-            <div className="stat-label">Coût stockage min</div>
-            <div className="stat-value" style={{ fontSize: '1rem' }}>
-              {fmt(wilson_base.cout_stockage_min)}
+          <div className="grid-4">
+            <div className="stat-card blue">
+              <div className="stat-label">N optimal</div>
+              <div className="stat-value">{wilson_base.N_arrondi}</div>
+              <div className="stat-unit">commandes/an</div>
             </div>
-            <div className="stat-unit">Ar</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Statistiques simulation */}
-      <div className="card">
-        <div className="card-title">
-          {onglet === 'quantites'
-            ? '📦 Résultats — Quantités constantes (Qe fixe, dates variables)'
-            : '📅 Résultats — Périodes constantes (dates fixes, quantités variables)'}
-        </div>
-        <div className="grid-4">
-          <div className="stat-card blue">
-            <div className="stat-label">Nb commandes passées</div>
-            <div className="stat-value">{statistiques.nb_livraisons}</div>
-          </div>
-          <div className="stat-card green">
-            <div className="stat-label">Stock moyen</div>
-            <div className="stat-value">{fmt(statistiques.stock_moyen)}</div>
-            <div className="stat-unit">unités</div>
-          </div>
-          <div className="stat-card orange">
-            <div className="stat-label">Stock min</div>
-            <div className="stat-value">{fmt(statistiques.stock_min)}</div>
-            <div className="stat-unit">unités</div>
-          </div>
-          <div className="stat-card red">
-            <div className="stat-label">Ruptures de stock</div>
-            <div className="stat-value"
-              style={{ color: statistiques.nb_ruptures > 0 ? '#e53e3e' : '#38a169' }}>
-              {statistiques.nb_ruptures}
+            <div className="stat-card green">
+              {onglet === 'quantites' ? (
+                <>
+                  <div className="stat-label">Qe (lot fixe)</div>
+                  <div className="stat-value">{fmt(wilson_base.Qe)}</div>
+                  <div className="stat-unit">u/commande</div>
+                </>
+              ) : (
+                <>
+                  <div className="stat-label">Période fixe T</div>
+                  <div className="stat-value">{wilson_base.periode_mois}</div>
+                  <div className="stat-unit">mois entre commandes</div>
+                </>
+              )}
+            </div>
+            <div className="stat-card orange">
+              <div className="stat-label">Point de commande SCM</div>
+              <div className="stat-value">{fmt(wilson_base.point_commande)}</div>
+              <div className="stat-unit">unités</div>
+            </div>
+            <div className="stat-card purple">
+              <div className="stat-label">Coût stockage min</div>
+              <div className="stat-value" style={{ fontSize: '1rem' }}>
+                {fmt(wilson_base.cout_stockage_min)}
+              </div>
+              <div className="stat-unit">Ar</div>
             </div>
           </div>
         </div>
-
-        {statistiques.nb_ruptures > 0 && (
-          <div className="alert alert-error mt-2">
-            ⚠️ {statistiques.nb_ruptures} rupture(s) de stock détectée(s).
-            Augmentez le stock de sécurité ou la marge de sécurité.
+  
+        {/* Statistiques simulation */}
+        <div className="card">
+          <div className="card-title">
+            {onglet === 'quantites'
+              ? '📦 Statistiques — Quantités constantes'
+              : '📅 Statistiques — Périodes constantes'}
           </div>
-        )}
-        {statistiques.nb_ruptures === 0 && (
-          <div className="alert alert-success mt-2">
-            ✅ Aucune rupture de stock. La politique de commande est satisfaisante.
+          <div className="grid-4">
+            <div className="stat-card blue">
+              <div className="stat-label">Nb livraisons</div>
+              <div className="stat-value">{statistiques.nb_livraisons}</div>
+            </div>
+            <div className="stat-card green">
+              <div className="stat-label">Stock moyen</div>
+              <div className="stat-value">{fmt(statistiques.stock_moyen)}</div>
+              <div className="stat-unit">unités</div>
+            </div>
+            <div className="stat-card orange">
+              <div className="stat-label">Stock min</div>
+              <div className="stat-value">{fmt(statistiques.stock_min)}</div>
+              <div className="stat-unit">unités</div>
+            </div>
+            <div className="stat-card red">
+              <div className="stat-label">Ruptures</div>
+              <div className="stat-value"
+                style={{ color: statistiques.nb_ruptures > 0 ? '#e53e3e' : '#38a169' }}>
+                {statistiques.nb_ruptures}
+              </div>
+            </div>
           </div>
-        )}
-      </div>
-
-      {/* Graphique évolution stock */}
-      <div className="card">
-        <div className="card-title">📈 Évolution du stock</div>
-        <StockChart
-          resume={sim.resume}
-          point_commande={wilson_base.point_commande}
-        />
-        <p className="text-muted mt-1" style={{ fontSize: '0.8rem' }}>
-          La ligne rouge pointillée représente le point de commande (SCM = {fmt(wilson_base.point_commande)} u)
-        </p>
-      </div>
-
-      {/* Tableau résumé */}
-      <div className="card">
-        <div className="card-title">📋 Tableau de suivi du stock</div>
-        <ResumeStockTable
-          resume={sim.resume}
-          commandes={sim.commandes || sim.livraisons_planifiees}
-        />
-      </div>
-    </>
-  );
-}
+          {statistiques.nb_ruptures > 0 ? (
+            <div className="alert alert-error mt-2">
+              ⚠️ {statistiques.nb_ruptures} rupture(s) détectée(s).
+              Augmentez le stock de sécurité ou la marge de sécurité.
+            </div>
+          ) : (
+            <div className="alert alert-success mt-2">
+              ✅ Aucune rupture de stock. Politique satisfaisante.
+            </div>
+          )}
+        </div>
+  
+        {/* Graphique */}
+        <div className="card">
+          <div className="card-title">📈 Évolution du stock</div>
+          <StockChart
+            resume={simulation.tableau}
+            point_commande={wilson_base.point_commande}
+          />
+          <p className="text-muted mt-1" style={{ fontSize: '0.8rem' }}>
+            Ligne rouge pointillée = SCM ({fmt(wilson_base.point_commande)} u)
+          </p>
+        </div>
+  
+        {/* TABLEAU EXACT DU COURS */}
+        <div className="card">
+          <div className="card-title">
+            📋 Tableaux de suivi du stock — Format cours GFB
+          </div>
+          <ResumeStockTable
+            tableau={simulation.tableau}
+            synthese={simulation.synthese}
+            methode={simulation.methode}
+          />
+        </div>
+      </>
+    );
+  }
 
 /* ============================================================
    Composant comparaison des deux méthodes
