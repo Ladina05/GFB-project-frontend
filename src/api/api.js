@@ -26,3 +26,7 @@ export const comparerMethodesIrregulier = (data) =>
   API.post('/irregulier/comparer', data);
 export const getHistoriqueIrregulier = () =>
   API.get('/irregulier/historique');
+export const getIrregulierDetail = (id) =>
+  API.get(`/irregulier/${id}`);
+export const deleteIrregulier = (id) =>
+  API.delete(`/irregulier/${id}`);

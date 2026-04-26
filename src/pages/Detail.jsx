@@ -6,6 +6,15 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faMagnifyingGlassChart,
+  faArrowLeft,
+  faFileImport,
+  faSquarePollVertical,
+  faChartSimple,
+  faTableList,
+} from '@fortawesome/free-solid-svg-icons';
 
 export default function Detail() {
   const { id } = useParams();
@@ -43,23 +52,25 @@ export default function Detail() {
     <div className="container">
       <div className="flex-between mb-2">
         <div className="page-header" style={{ marginBottom: 0 }}>
-          <h1>🔍 Détail calcul #{data.id}</h1>
+          <h1><FontAwesomeIcon icon={faMagnifyingGlassChart} /> Detail calcul #{data.id}</h1>
           <p>
             {data.article_nom || 'Sans article'} —{' '}
             {new Date(data.created_at).toLocaleString('fr-FR')}
           </p>
         </div>
         <button className="btn btn-secondary" onClick={() => nav('/historique')}>
-          ← Retour
+          <FontAwesomeIcon icon={faArrowLeft} />
+          <span>Retour</span>
         </button>
       </div>
 
       <div className="grid-2">
         <div className="card">
-          <div className="card-title">📥 Données d'entrée</div>
+          <div className="card-title"><FontAwesomeIcon icon={faFileImport} /> Donnees d'entree</div>
           <table>
             <tbody>
               {[
+                ['Article', data.article_nom || 'Sans article'],
                 ['C — Consommation annuelle', `${fmt(data.consommation_annuelle)} unités`],
                 ['Pu — Prix unitaire', `${fmt(data.prix_unitaire)} Ar`],
                 ['f — Coût de passation', `${fmt(data.cout_passation)} Ar`],
@@ -78,7 +89,7 @@ export default function Detail() {
         </div>
 
         <div className="card">
-          <div className="card-title">📊 Résultats</div>
+          <div className="card-title"><FontAwesomeIcon icon={faSquarePollVertical} /> Resultats</div>
           <div className="grid-2">
             <div className="stat-card blue">
               <div className="stat-label">N optimal</div>
@@ -116,7 +127,7 @@ export default function Detail() {
 
       {chartData.length > 0 && (
         <div className="card">
-          <div className="card-title">📈 Courbes de coûts</div>
+          <div className="card-title"><FontAwesomeIcon icon={faChartSimple} /> Courbes de couts</div>
           <div className="chart-container">
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData}>
@@ -136,7 +147,7 @@ export default function Detail() {
 
       {sims?.length > 0 && (
         <div className="card">
-          <div className="card-title">📋 Tableau de simulation</div>
+          <div className="card-title"><FontAwesomeIcon icon={faTableList} /> Tableau de simulation</div>
           <SimulationTable simulations={sims} />
         </div>
       )}

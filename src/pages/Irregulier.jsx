@@ -7,6 +7,20 @@ import {
 } from '../api/api';
 import StockChart from '../components/StockChart';
 import ResumeStockTable from '../components/ResumeStockTable';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faChartLine,
+  faBoxArchive,
+  faCircleInfo,
+  faTableList,
+  faBookOpen,
+  faSliders,
+  faFloppyDisk,
+  faClock,
+  faPlay,
+  faTriangleExclamation,
+  faCircleCheck,
+} from '@fortawesome/free-solid-svg-icons';
 
 const MOIS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
 
@@ -31,8 +45,9 @@ export default function Irregulier() {
   const [onglet, setOnglet] = useState('quantites'); // 'quantites' | 'periodes' | 'comparaison'
   const [resultat, setResultat] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [sauvegarder, setSauvegarder] = useState(false);
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     getArticles().then((r) => setArticles(r.data.data)).catch(() => {});
@@ -42,10 +57,12 @@ export default function Irregulier() {
     const arr = [...consommations];
     arr[i] = val;
     setConsommations(arr);
+    setSuccess('');
   };
 
   const handleParamChange = (e) => {
     setParams({ ...params, [e.target.name]: e.target.value });
+    setSuccess('');
   };
 
   const totalConso = consommations.reduce((a, b) => a + (parseFloat(b) || 0), 0);
@@ -63,7 +80,7 @@ export default function Irregulier() {
     return true;
   };
 
-  const buildPayload = () => ({
+  const buildPayload = (shouldSave = false) => ({
     consommations: consommations.map(Number),
     stock_initial: parseFloat(params.stock_initial || 0),
     prix_unitaire: parseFloat(params.prix_unitaire),
@@ -73,16 +90,20 @@ export default function Irregulier() {
     marge_securite: parseFloat(params.marge_securite || 1),
     stock_securite: parseFloat(params.stock_securite || 0),
     article_id: params.article_id || null,
-    sauvegarder,
+    sauvegarder: shouldSave,
   });
 
-  const handleSimuler = async () => {
+  const runSimulation = async (shouldSave = false) => {
     if (!valider()) return;
-    setLoading(true);
+    if (shouldSave) {
+      setSaving(true);
+    } else {
+      setLoading(true);
+    }
     setResultat(null);
     try {
       let res;
-      const payload = buildPayload();
+      const payload = buildPayload(shouldSave);
       if (onglet === 'quantites') {
         res = await simulerQtesConstantes(payload);
       } else if (onglet === 'periodes') {
@@ -91,11 +112,27 @@ export default function Irregulier() {
         res = await comparerMethodesIrregulier(payload);
       }
       setResultat(res.data.data);
+      if (shouldSave) {
+        setSuccess('Simulation sauvegardee en base de donnees');
+      }
     } catch (e) {
       setError(e.response?.data?.message || 'Erreur lors de la simulation');
     } finally {
-      setLoading(false);
+      if (shouldSave) {
+        setSaving(false);
+      } else {
+        setLoading(false);
+      }
     }
+  };
+
+  const handleSimuler = async () => {
+    setSuccess('');
+    await runSimulation(false);
+  };
+
+  const handleSauvegarder = async () => {
+    await runSimulation(true);
   };
 
   const handleExemple = () => {
@@ -111,6 +148,7 @@ export default function Irregulier() {
     });
     setResultat(null);
     setError('');
+    setSuccess('');
   };
 
   const fmt = (v) => new Intl.NumberFormat('fr-MG').format(Math.round(v || 0));
@@ -118,32 +156,16 @@ export default function Irregulier() {
   return (
     <div className="container">
       <div className="page-header">
-        <h1>📊 Consommation Irrégulière</h1>
+        <h1><FontAwesomeIcon icon={faChartLine} /> Consommation Irreguliere</h1>
         <p>Gestion des approvisionnements avec consommations mensuelles variables</p>
-      </div>
-
-      {/* ===== ONGLETS ===== */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-        {[
-          { key: 'quantites', label: '📦 Quantités constantes', desc: 'Lot fixe Qe, dates variables' },
-        ].map((o) => (
-          <button
-            key={o.key}
-            className={onglet === o.key ? 'btn btn-primary' : 'btn btn-outline'}
-            onClick={() => { setOnglet(o.key); setResultat(null); }}
-          >
-            {o.label}
-          </button>
-        ))}
       </div>
 
       {/* ===== EXPLICATION METHODE ===== */}
       <div className="alert alert-info" style={{ marginBottom: '1.5rem' }}>
         {onglet === 'quantites' && (
           <>
-            <strong>📦 Méthode des quantités constantes :</strong> On commande toujours la même
-            quantité Qe (calculée par Wilson), mais les dates de commande varient selon le niveau
-            du stock. On déclenche une commande quand le stock atteint le point de commande (SCM).
+            <strong><FontAwesomeIcon icon={faCircleInfo} /> Methode des quantités constantes :</strong> On commande toujours la même
+            quantité Qe, mais les dates de commande varient selon le niveau du stock. On déclenche une commande quand le stock atteint le point de commande (SCM).
           </>
         )}
       </div>
@@ -152,10 +174,11 @@ export default function Irregulier() {
         {/* ===== SAISIE CONSOMMATIONS ===== */}
         <div className="card">
           <div className="card-title flex-between">
-            <span>📋 Consommations mensuelles</span>
+            <span><FontAwesomeIcon icon={faTableList} /> Consommations mensuelles</span>
             <button className="btn btn-outline" style={{ fontSize: '0.8rem', padding: '0.3rem 0.7rem' }}
               onClick={handleExemple}>
-              📚 Exemple cours
+              <FontAwesomeIcon icon={faBookOpen} />
+              <span>Exemple cours</span>
             </button>
           </div>
 
@@ -215,9 +238,10 @@ export default function Irregulier() {
 
         {/* ===== PARAMETRES ===== */}
         <div className="card">
-          <div className="card-title">⚙️ Paramètres</div>
+          <div className="card-title"><FontAwesomeIcon icon={faSliders} /> Parametres</div>
 
           {error && <div className="alert alert-error">{error}</div>}
+          {success && <div className="alert alert-success">{success}</div>}
 
           <div className="form-group">
             <label className="form-label">Article (optionnel)</label>
@@ -270,24 +294,23 @@ export default function Irregulier() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-            <input type="checkbox" id="sauvegarder" checked={sauvegarder}
-              onChange={(e) => setSauvegarder(e.target.checked)} />
-            <label htmlFor="sauvegarder" style={{ fontSize: '0.88rem', color: '#4a5568', cursor: 'pointer' }}>
-              💾 Sauvegarder en base de données
-            </label>
-          </div>
-
           <button className="btn btn-primary" style={{ width: '100%' }}
             onClick={handleSimuler} disabled={loading}>
-            {loading ? '⏳ Simulation...' : '▶️ Lancer la simulation'}
+            <FontAwesomeIcon icon={loading ? faClock : faPlay} />
+            <span>{loading ? 'Simulation...' : 'Lancer la simulation'}</span>
           </button>
         </div>
       </div>
 
       {/* ===== RESULTATS ===== */}
       {resultat && onglet !== 'comparaison' && (
-        <ResultatSimple resultat={resultat} onglet={onglet} fmt={fmt} />
+        <ResultatSimple
+          resultat={resultat}
+          onglet={onglet}
+          fmt={fmt}
+          saving={saving}
+          onSauvegarder={handleSauvegarder}
+        />
       )}
 
       {resultat && onglet === 'comparaison' && (
@@ -300,17 +323,27 @@ export default function Irregulier() {
 /* ============================================================
    Composant résultat — une seule méthode
    ============================================================ */
-   function ResultatSimple({ resultat, onglet, fmt }) {
+   function ResultatSimple({ resultat, onglet, fmt, saving, onSauvegarder }) {
     const { wilson_base, simulation, statistiques, consommation_annuelle } = resultat;
   
     return (
       <>
         {/* Statistiques simulation */}
         <div className="card">
-          <div className="card-title">
-            {onglet === 'quantites'
-              ? '📦 Statistiques — Quantités constantes'
-              : '📅 Statistiques — Périodes constantes'}
+          <div className="flex-between mb-2">
+            <div className="card-title" style={{ marginBottom: 0 }}>
+              {onglet === 'quantites'
+                ? 'Statistiques'
+                : 'Statistiques - Periodes constantes'}
+            </div>
+            <button
+              className="btn btn-success"
+              onClick={onSauvegarder}
+              disabled={saving}
+            >
+              <FontAwesomeIcon icon={saving ? faClock : faFloppyDisk} />
+              <span>{saving ? 'Sauvegarde...' : 'Sauvegarder'}</span>
+            </button>
           </div>
           <div className="grid-4">
             <div className="stat-card blue">
@@ -337,19 +370,19 @@ export default function Irregulier() {
           </div>
           {statistiques.nb_ruptures > 0 ? (
             <div className="alert alert-error mt-2">
-              ⚠️ {statistiques.nb_ruptures} rupture(s) détectée(s).
+              <FontAwesomeIcon icon={faTriangleExclamation} /> {statistiques.nb_ruptures} rupture(s) detectee(s).
               Augmentez le stock de sécurité ou la marge de sécurité.
             </div>
           ) : (
             <div className="alert alert-success mt-2">
-              ✅ Aucune rupture de stock. Politique satisfaisante.
+              <FontAwesomeIcon icon={faCircleCheck} /> Aucune rupture de stock. Politique satisfaisante.
             </div>
           )}
         </div>
   
         {/* Graphique */}
         <div className="card">
-          <div className="card-title">📈 Évolution du stock</div>
+          <div className="card-title"><FontAwesomeIcon icon={faChartLine} /> Evolution du stock</div>
           <StockChart
             resume={simulation.tableau}
             point_commande={wilson_base.point_commande}
@@ -362,7 +395,7 @@ export default function Irregulier() {
         {/* TABLEAU EXACT DU COURS */}
         <div className="card">
           <div className="card-title">
-            📋 Tableaux de suivi du stock
+            <FontAwesomeIcon icon={faTableList} /> Tableaux de suivi du stock
           </div>
           <ResumeStockTable
             tableau={simulation.tableau}

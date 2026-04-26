@@ -1,3 +1,6 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck, faScaleBalanced } from '@fortawesome/free-solid-svg-icons';
+
 export default function SimulationTable({ simulations }) {
   if (!simulations || simulations.length === 0) return null;
 
@@ -29,9 +32,15 @@ export default function SimulationTable({ simulations }) {
               <td><strong>{formatter(sim.cout_total)} Ar</strong></td>
               <td>
                 {sim.est_optimal ? (
-                  <span className="badge badge-success">✅ Optimal</span>
+                  <span className="badge badge-success">
+                    <FontAwesomeIcon icon={faCircleCheck} />
+                    <span>Optimal</span>
+                  </span>
                 ) : (
-                  <span className="badge badge-info">Comparaison</span>
+                  <span className="badge badge-info">
+                    <FontAwesomeIcon icon={faScaleBalanced} />
+                    <span>Comparaison</span>
+                  </span>
                 )}
               </td>
             </tr>

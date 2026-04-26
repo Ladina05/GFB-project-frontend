@@ -6,6 +6,19 @@ import {
 import { calculerRapide, calculerEtSauvegarder, getArticles } from '../api/api';
 import SimulationTable from '../components/SimulationTable';
 import FormulaCard from '../components/FormulaCard';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCalculator,
+  faSliders,
+  faRotateRight,
+  faPlay,
+  faCircleCheck,
+  faFloppyDisk,
+  faClock,
+  faChartSimple,
+  faChartColumn,
+  faTriangleExclamation,
+} from '@fortawesome/free-solid-svg-icons';
 
 const initialForm = {
   article_id: '',
@@ -42,7 +55,7 @@ export default function Calculateur() {
   const handleCalculer = async () => {
     const { consommation_annuelle, prix_unitaire, cout_passation, taux_possession } = form;
     if (!consommation_annuelle || !prix_unitaire || !cout_passation || !taux_possession) {
-      setError('⚠️ Veuillez remplir les champs obligatoires (*)');
+      setError('Veuillez remplir les champs obligatoires (*)');
       return;
     }
     setLoading(true);
@@ -66,7 +79,7 @@ export default function Calculateur() {
     setSaving(true);
     try {
       await calculerEtSauvegarder(form);
-      setSuccess('✅ Calcul sauvegardé en base de données !');
+      setSuccess('Calcul sauvegarde en base de donnees');
     } catch (e) {
       setError(e.response?.data?.message || 'Erreur de sauvegarde');
     } finally {
@@ -94,129 +107,133 @@ export default function Calculateur() {
   return (
     <div className="container">
       <div className="page-header">
-        <h1>🧮 Calculateur Wilson</h1>
+        <h1><FontAwesomeIcon icon={faCalculator} /> Calculateur Wilson</h1>
         <p>Détermination de la période de commande à quantité constante</p>
       </div>
 
-      <div className="grid-2">
-        {/* ===== FORMULAIRE ===== */}
-        <div className="card">
-          <div className="card-title">📝 Paramètres d'entrée</div>
+      {/* ===== FORMULAIRE — pleine largeur ===== */}
+      <div className="card card-form-full">
+        <div className="card-title"><FontAwesomeIcon icon={faSliders} /> Parametres d'entree</div>
 
-          {error && <div className="alert alert-error">{error}</div>}
-          {success && <div className="alert alert-success">{success}</div>}
+        {error && <div className="alert alert-error">{error}</div>}
+        {success && <div className="alert alert-success">{success}</div>}
+
+        {/* Article selector — pleine largeur */}
+        <div className="form-group">
+          <label className="form-label">Article (optionnel)</label>
+          <select className="form-select" name="article_id" value={form.article_id} onChange={handleChange}>
+            <option value="">-- Sélectionner un article --</option>
+            {articles.map((a) => (
+              <option key={a.id} value={a.id}>{a.nom}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Champs en grille 4 colonnes */}
+        <div className="grid-4">
+          <div className="form-group">
+            <label className="form-label">
+              C — Consommation annuelle * <span>(unités/an)</span>
+            </label>
+            <input
+              className="form-input"
+              type="number"
+              name="consommation_annuelle"
+              value={form.consommation_annuelle}
+              onChange={handleChange}
+              placeholder="ex: 1000"
+            />
+          </div>
 
           <div className="form-group">
-            <label className="form-label">Article (optionnel)</label>
-            <select className="form-select" name="article_id" value={form.article_id} onChange={handleChange}>
-              <option value="">-- Sélectionner un article --</option>
-              {articles.map((a) => (
-                <option key={a.id} value={a.id}>{a.nom}</option>
-              ))}
-            </select>
+            <label className="form-label">
+              Pu — Prix unitaire * <span>(Ar)</span>
+            </label>
+            <input
+              className="form-input"
+              type="number"
+              name="prix_unitaire"
+              value={form.prix_unitaire}
+              onChange={handleChange}
+              placeholder="ex: 18000"
+            />
           </div>
 
-          <div className="grid-2">
-            <div className="form-group">
-              <label className="form-label">
-                C — Consommation annuelle * <span>(unités/an)</span>
-              </label>
-              <input
-                className="form-input"
-                type="number"
-                name="consommation_annuelle"
-                value={form.consommation_annuelle}
-                onChange={handleChange}
-                placeholder="ex: 1000"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">
-                Pu — Prix unitaire * <span>(Ar)</span>
-              </label>
-              <input
-                className="form-input"
-                type="number"
-                name="prix_unitaire"
-                value={form.prix_unitaire}
-                onChange={handleChange}
-                placeholder="ex: 18000"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">
-                f — Coût de passation * <span>(Ar/commande)</span>
-              </label>
-              <input
-                className="form-input"
-                type="number"
-                name="cout_passation"
-                value={form.cout_passation}
-                onChange={handleChange}
-                placeholder="ex: 70000"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">
-                t — Taux de possession * <span>(%)</span>
-              </label>
-              <input
-                className="form-input"
-                type="number"
-                name="taux_possession"
-                value={form.taux_possession}
-                onChange={handleChange}
-                placeholder="ex: 12"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">SI — Stock initial <span>(unités)</span></label>
-              <input
-                className="form-input"
-                type="number"
-                name="stock_initial"
-                value={form.stock_initial}
-                onChange={handleChange}
-                placeholder="ex: 350"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">d — Délai approvisionnement <span>(mois)</span></label>
-              <input
-                className="form-input"
-                type="number"
-                name="delai_approvisionnement"
-                value={form.delai_approvisionnement}
-                onChange={handleChange}
-                placeholder="ex: 1.5"
-                step="0.1"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Ss — Stock de sécurité <span>(unités)</span></label>
-              <input
-                className="form-input"
-                type="number"
-                name="stock_securite"
-                value={form.stock_securite}
-                onChange={handleChange}
-                placeholder="ex: 50"
-              />
-            </div>
+          <div className="form-group">
+            <label className="form-label">
+              f — Coût de passation * <span>(Ar/commande)</span>
+            </label>
+            <input
+              className="form-input"
+              type="number"
+              name="cout_passation"
+              value={form.cout_passation}
+              onChange={handleChange}
+              placeholder="ex: 70000"
+            />
           </div>
 
-          <div className="flex-end mt-2">
-            <button className="btn btn-secondary" onClick={handleReset}>🔄 Réinitialiser</button>
-            <button className="btn btn-primary" onClick={handleCalculer} disabled={loading}>
-              {loading ? '⏳ Calcul...' : '🧮 Calculer'}
-            </button>
+          <div className="form-group">
+            <label className="form-label">
+              t — Taux de possession * <span>(%)</span>
+            </label>
+            <input
+              className="form-input"
+              type="number"
+              name="taux_possession"
+              value={form.taux_possession}
+              onChange={handleChange}
+              placeholder="ex: 12"
+            />
           </div>
+
+          <div className="form-group">
+            <label className="form-label">SI — Stock initial <span>(unités)</span></label>
+            <input
+              className="form-input"
+              type="number"
+              name="stock_initial"
+              value={form.stock_initial}
+              onChange={handleChange}
+              placeholder="ex: 350"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">d — Délai approvisionnement <span>(mois)</span></label>
+            <input
+              className="form-input"
+              type="number"
+              name="delai_approvisionnement"
+              value={form.delai_approvisionnement}
+              onChange={handleChange}
+              placeholder="ex: 1.5"
+              step="0.1"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Ss — Stock de sécurité <span>(unités)</span></label>
+            <input
+              className="form-input"
+              type="number"
+              name="stock_securite"
+              value={form.stock_securite}
+              onChange={handleChange}
+              placeholder="ex: 50"
+            />
+          </div>
+        </div>
+
+        <div className="flex-end mt-2">
+          <button className="btn btn-secondary" onClick={handleReset}>
+            <FontAwesomeIcon icon={faRotateRight} />
+            <span>Reinitialiser</span>
+          </button>
+          <button className="btn btn-primary" onClick={handleCalculer} disabled={loading}>
+            <FontAwesomeIcon icon={loading ? faClock : faPlay} />
+            <span>{loading ? 'Calcul...' : 'Calculer'}</span>
+          </button>
         </div>
       </div>
 
@@ -226,14 +243,15 @@ export default function Calculateur() {
           <div className="card">
             <div className="flex-between mb-2">
               <div className="card-title" style={{ marginBottom: 0 }}>
-                ✅ Résultats — Modèle de Wilson
+                <FontAwesomeIcon icon={faCircleCheck} /> Resultats - Modele de Wilson
               </div>
               <button
                 className="btn btn-success"
                 onClick={handleSauvegarder}
                 disabled={saving}
               >
-                {saving ? '⏳ Sauvegarde...' : '💾 Sauvegarder'}
+                <FontAwesomeIcon icon={saving ? faClock : faFloppyDisk} />
+                <span>{saving ? 'Sauvegarde...' : 'Sauvegarder'}</span>
               </button>
             </div>
 
@@ -285,17 +303,17 @@ export default function Calculateur() {
             </div>
 
             <div className="alert alert-info mt-2">
-              <strong>📅 Interprétation :</strong> Commander <strong>{fmt(resultat.Qe)} unités</strong> tous les{' '}
+              <strong><FontAwesomeIcon icon={faClock} /> Interpretation :</strong> Commander <strong>{fmt(resultat.Qe)} unites</strong> tous les{' '}
               <strong>{resultat.periode_mois} mois</strong> ({resultat.N_arrondi} commandes/an).
-              Déclencher la commande quand le stock atteint{' '}
-              <strong>{fmt(resultat.point_commande)} unités</strong>.
+              Declencher la commande quand le stock atteint{' '}
+              <strong>{fmt(resultat.point_commande)} unites</strong>.
               N exact = {resultat.N_optimal}
             </div>
           </div>
 
           {/* Graphique */}
           <div className="card">
-            <div className="card-title">📈 Courbes de coûts</div>
+            <div className="card-title"><FontAwesomeIcon icon={faChartSimple} /> Courbes de couts</div>
             <div className="chart-container">
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={chartData}>
@@ -314,7 +332,7 @@ export default function Calculateur() {
 
           {/* Tableau simulation */}
           <div className="card">
-            <div className="card-title">📊 Simulation par cadence</div>
+            <div className="card-title"><FontAwesomeIcon icon={faChartColumn} /> Simulation par cadence</div>
             <SimulationTable simulations={resultat.simulations} />
           </div>
         </>

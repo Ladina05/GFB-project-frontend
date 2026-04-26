@@ -1,7 +1,44 @@
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCalculator,
+  faClockRotateLeft,
+  faDraftingCompass,
+  faChartLine,
+  faFloppyDisk,
+  faBoxesPacking,
+  faArrowRight,
+} from '@fortawesome/free-solid-svg-icons';
 
 export default function Home() {
   const nav = useNavigate();
+  const features = [
+    {
+      icon: faDraftingCompass,
+      titre: 'Modele de Wilson',
+      desc: 'Calcul du nombre optimal de commandes N et de la quantite economique Qe',
+      lien: '/calculateur',
+    },
+    {
+      icon: faChartLine,
+      titre: 'Consommation irreguliere',
+      desc: 'Simulation avec quantites constantes ou periodes constantes selon le cours GFB',
+      lien: '/irregulier',
+    },
+    {
+      icon: faBoxesPacking,
+      titre: 'Articles',
+      desc: 'Gerez vos articles et associez-les aux calculs',
+      lien: '/articles',
+    },
+    {
+      icon: faFloppyDisk,
+      titre: 'Historique',
+      desc: 'Sauvegarde en PostgreSQL de tous vos calculs et simulations',
+      lien: '/historique',
+    },
+  ];
+
   return (
     <div className="container">
       <div className="hero">
@@ -11,43 +48,28 @@ export default function Home() {
         </p>
         <div className="hero-actions">
           <button className="btn btn-success" onClick={() => nav('/calculateur')}>
-            🧮 Lancer un calcul
+            <FontAwesomeIcon icon={faCalculator} />
+            <span>Lancer un calcul</span>
           </button>
           <button className="btn btn-outline" style={{ color: 'white', borderColor: 'white' }}
             onClick={() => nav('/historique')}>
-            📋 Voir l'historique
+            <FontAwesomeIcon icon={faClockRotateLeft} />
+            <span>Voir l'historique</span>
           </button>
         </div>
       </div>
 
-      <div className="grid-3">
-        {[
-          {
-            icon: '📐', titre: 'Modèle de Wilson',
-            desc: 'Calcul du nombre optimal de commandes N et de la quantité économique Qe',
-            lien: '/calculateur',
-          },
-          {
-            icon: '📊', titre: 'Consommation irrégulière',
-            desc: 'Simulation avec quantités constantes ou périodes constantes selon le cours GFB',
-            lien: '/irregulier',
-          },
-          {
-            icon: '💾', titre: 'Historique',
-            desc: 'Sauvegarde en PostgreSQL de tous vos calculs et simulations',
-            lien: '/historique',
-          },
-          {
-            icon: '🗂️', titre: 'Articles',
-            desc: 'Gérez vos articles et associez-les aux calculs',
-            lien: '/articles',
-          },
-        ].map((f, i) => (
+      <div className="feature-grid-centered">
+        {features.map((f, i) => (
           <div key={i} className="feature-card" onClick={() => nav(f.lien)}
             style={{ cursor: 'pointer' }}>
-            <div className="feature-icon">{f.icon}</div>
+            <div className="feature-icon"><FontAwesomeIcon icon={f.icon} /></div>
             <h3>{f.titre}</h3>
             <p>{f.desc}</p>
+            <span className="feature-link">
+              Decouvrir
+              <FontAwesomeIcon icon={faArrowRight} />
+            </span>
           </div>
         ))}
       </div>
